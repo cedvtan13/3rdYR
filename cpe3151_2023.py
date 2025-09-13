@@ -76,13 +76,13 @@ def decrypt(key, ciphertext):
 
 
 if __name__ == '__main__':
-    message1 = " "
-    key = " "
+    # Provided ciphertexts in hex
+    ciphertextHex1 = "2404001216065215060413100d1663042d56114550101c1d1f0700453b3745051a0049061c0d0916121f0e1518151c0c0d060811051157"
+    ciphertextHex2 = "24091600150c0011540510140b16314a656303040522575a5e5524091712160655010c1a1d430d41101b4b1703091a161752011b081657"
 
-    ciphertextHex1 = ""  # insert between " " the assigned ciphertext in hexstring format
-    ciphertextHex2 = ""  # insert between " " the assigned ciphertext in hexstring format
-
-    # Convert the hexstring format to ascii string format. Insert script below.
+    # Convert hex to ASCII string (latin1 to preserve all byte values)
+    ciphertext1 = bytes.fromhex(ciphertextHex1).decode('latin1')
+    ciphertext2 = bytes.fromhex(ciphertextHex2).decode('latin1')
 
     guess = input("Guess a word: ")
     crib_drag_attack(guess, ciphertext1, ciphertext2)
