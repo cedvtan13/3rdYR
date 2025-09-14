@@ -1,11 +1,17 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
-// Link with Winsock library
-#pragma comment(lib, "ws2_32.lib")
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+#include <ctype.h>
+#include <sys/types.h>
 
 #define BUFFER_SIZE 4096
 #define MAX_HOST_LENGTH 256
@@ -19,22 +25,21 @@ typedef struct {
     int is_valid;         // 1 if request is good, 0 if bad
 } HttpRequest;
 
-// Function to initialize Windows sockets
-int init_winsock() {
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        printf("WSAStartup failed: %d\n", result);
-        return 0;
-    }
-    printf("Winsock initialized successfully!\n");
-    return 1;
+// Global proxy socket for cleanup
+int proxy_socket = -1;
+
+// Signal handler for SIGCHLD to clean up zombie processes
+void sigchld_handler(int sig) {
+    while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-// Function to clean up Windows sockets
-void cleanup_winsock() {
-    WSACleanup();
-    printf("Winsock cleaned up.\n");
+// Signal handler for graceful shutdown
+void sigint_handler(int sig) {
+    printf("\nShutting down proxy server...\n");
+    if (proxy_socket >= 0) {
+        close(proxy_socket);
+    }
+    exit(0);
 }
 
 // Function to remove spaces from beginning and end of string
@@ -54,231 +59,249 @@ char* trim_string(char* str) {
     return str;
 }
 
-// Simple function to parse HTTP request
-HttpRequest parse_request(char* request) {
+// Function to get hostname from "Host:" header
+int get_host_from_header(char* header_line, char* hostname, int* port) {
+    // Look for "Host:" (case insensitive)
+    char* host_start = strchr(header_line, ':');
+    if (!host_start) return 0;
+    
+    host_start++; // Move past ':'
+    host_start = trim_string(host_start);
+    
+    // Check if port is specified
+    char* port_pos = strchr(host_start, ':');
+    if (port_pos) {
+        *port_pos = '\0';
+        strcpy(hostname, host_start);
+        *port = atoi(port_pos + 1);
+    } else {
+        strcpy(hostname, host_start);
+        *port = 80; // Default HTTP port
+    }
+    
+    return 1;
+}
+
+// Function to parse HTTP request and get important info
+HttpRequest parse_request(char* request_text) {
     HttpRequest req;
-    memset(&req, 0, sizeof(req));  // Clear everything to 0
-    req.port = 80;  // Default HTTP port
+    memset(&req, 0, sizeof(req));
+    req.port = 80; // Default port
     req.is_valid = 0;
     
-    printf("\n=== Parsing HTTP Request ===\n");
-    printf("Raw request:\n%s\n", request);
+    // Make a copy to work with
+    char* request_copy = malloc(strlen(request_text) + 1);
+    strcpy(request_copy, request_text);
     
-    // Make a copy we can modify
-    char temp[BUFFER_SIZE];
-    strcpy_s(temp, sizeof(temp), request);
-    
-    // Get first line: "GET http://www.google.com/ HTTP/1.1"
-    char* first_line = strtok_s(temp, "\r\n", NULL);
+    // Get first line (request line)
+    char* first_line = strtok(request_copy, "\r\n");
     if (!first_line) {
-        printf("ERROR: No first line found!\n");
+        free(request_copy);
         return req;
     }
     
-    printf("First line: %s\n", first_line);
+    // Parse: METHOD URL HTTP/1.1
+    char url[1024];
+    char version[32];
     
-    // Parse: METHOD URL VERSION
-    char url[512];
-    if (sscanf_s(first_line, "%15s %511s", req.method, (unsigned)sizeof(req.method), url, (unsigned)sizeof(url)) != 2) {
-        printf("ERROR: Cannot parse method and URL!\n");
+    if (sscanf(first_line, "%15s %1023s %31s", req.method, url, version) != 3) {
+        free(request_copy);
         return req;
     }
     
-    printf("Method: %s\n", req.method);
-    printf("URL: %s\n", url);
+    // Check if it's a supported method
+    if (strcmp(req.method, "GET") != 0 && strcmp(req.method, "POST") != 0 && 
+        strcmp(req.method, "HEAD") != 0 && strcmp(req.method, "CONNECT") != 0) {
+        free(request_copy);
+        return req;
+    }
     
-    // Check if URL starts with http://
+    // Parse URL
     if (strncmp(url, "http://", 7) == 0) {
-        // Full URL like: http://www.google.com/search
-        char* host_start = url + 7;  // Skip "http://"
-        char* path_start = strchr(host_start, '/');
+        // Full URL: http://hostname:port/path
+        char* hostname_start = url + 7;
+        char* path_start = strchr(hostname_start, '/');
+        char* port_start = strchr(hostname_start, ':');
         
         if (path_start) {
-            // Copy path
-            strcpy_s(req.path, sizeof(req.path), path_start);
-            *path_start = '\0';  // Cut off path from host
+            strcpy(req.path, path_start);
+            *path_start = '\0';
         } else {
-            strcpy_s(req.path, sizeof(req.path), "/");
+            strcpy(req.path, "/");
         }
         
-        // Check for port in host (like www.google.com:8080)
-        char* port_start = strchr(host_start, ':');
-        if (port_start) {
+        if (port_start && (!path_start || port_start < path_start)) {
             *port_start = '\0';
             req.port = atoi(port_start + 1);
         }
         
-        strcpy_s(req.host, sizeof(req.host), host_start);
+        strcpy(req.host, hostname_start);
     } else {
-        // Relative URL like: /search?q=hello
-        strcpy_s(req.path, sizeof(req.path), url);
+        // Relative URL - need to find Host header
+        strcpy(req.path, url);
         
-        // Need to find host in headers
-        char* line_context = NULL;
-        char* line = strtok_s(NULL, "\r\n", &line_context);
+        // Look for Host header
+        char* line = strtok(NULL, "\r\n");
         while (line) {
-            if (strncmp(line, "Host:", 5) == 0) {
-                char* host_value = line + 5;
-                host_value = trim_string(host_value);
-                
-                // Check for port
-                char* port_pos = strchr(host_value, ':');
-                if (port_pos) {
-                    *port_pos = '\0';
-                    req.port = atoi(port_pos + 1);
+            if (strncasecmp(line, "Host:", 5) == 0) {
+                if (get_host_from_header(line, req.host, &req.port)) {
+                    break;
                 }
-                
-                strcpy_s(req.host, sizeof(req.host), host_value);
-                break;
             }
-            line = strtok_s(NULL, "\r\n", &line_context);
+            line = strtok(NULL, "\r\n");
         }
     }
     
-    // Check if we got a valid host
     if (strlen(req.host) > 0) {
         req.is_valid = 1;
-        printf("✓ Valid request parsed!\n");
-        printf("  Host: %s\n", req.host);
-        printf("  Port: %d\n", req.port);
-        printf("  Path: %s\n", req.path);
-    } else {
-        printf("✗ Invalid request - no host found!\n");
     }
     
+    free(request_copy);
     return req;
 }
 
-// Function to send error message to client
-void send_error(SOCKET client_socket, char* error_message) {
-    char response[1024];
-    sprintf_s(response, sizeof(response),
-        "HTTP/1.1 400 Bad Request\r\n"
+// Function to send error response to client
+void send_error(int client_socket, char* error_message) {
+    char response[BUFFER_SIZE];
+    int content_length = strlen(error_message);
+    
+    snprintf(response, sizeof(response),
+        "HTTP/1.1 502 Bad Gateway\r\n"
         "Content-Type: text/html\r\n"
         "Content-Length: %d\r\n"
         "\r\n"
-        "%s", (int)strlen(error_message), error_message);
+        "%s",
+        content_length, error_message);
     
-    send(client_socket, response, (int)strlen(response), 0);
-    printf("Sent error response to client.\n");
+    send(client_socket, response, strlen(response), 0);
 }
 
-// Function to connect to the web server
-SOCKET connect_to_server(char* hostname, int port) {
-    printf("\n=== Connecting to Server ===\n");
+// Function to connect to remote server
+int connect_to_server(char* hostname, int port) {
     printf("Connecting to %s:%d...\n", hostname, port);
     
-    // Create socket
-    SOCKET server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server_socket == INVALID_SOCKET) {
-        printf("ERROR: Cannot create server socket!\n");
-        return INVALID_SOCKET;
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0) {
+        printf("Failed to create socket\n");
+        return -1;
     }
     
-    // Get server address
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     
     char port_str[16];
-    sprintf_s(port_str, sizeof(port_str), "%d", port);
+    snprintf(port_str, sizeof(port_str), "%d", port);
     
-    if (getaddrinfo(hostname, port_str, &hints, &result) != 0) {
-        printf("ERROR: Cannot resolve hostname %s\n", hostname);
-        closesocket(server_socket);
-        return INVALID_SOCKET;
+    int status = getaddrinfo(hostname, port_str, &hints, &result);
+    if (status != 0) {
+        printf("getaddrinfo failed: %s\n", gai_strerror(status));
+        close(server_socket);
+        return -1;
     }
     
-    // Connect to server
-    if (connect(server_socket, result->ai_addr, (int)result->ai_addrlen) == SOCKET_ERROR) {
-        printf("ERROR: Cannot connect to %s:%d\n", hostname, port);
+    if (connect(server_socket, result->ai_addr, result->ai_addrlen) < 0) {
+        printf("Connection failed: %s\n", strerror(errno));
         freeaddrinfo(result);
-        closesocket(server_socket);
-        return INVALID_SOCKET;
+        close(server_socket);
+        return -1;
     }
     
     freeaddrinfo(result);
-    printf("✓ Connected to server successfully!\n");
+    printf("✓ Connected to %s:%d successfully!\n", hostname, port);
     return server_socket;
 }
 
-// Function to forward data from one socket to another
-void forward_data(SOCKET from_socket, SOCKET to_socket, char* direction) {
+// Function to forward data between sockets
+void forward_data(int from_socket, int to_socket, char* direction) {
     char buffer[BUFFER_SIZE];
     int bytes_received;
+    int total_forwarded = 0;
     
     printf("Forwarding data %s...\n", direction);
     
     while ((bytes_received = recv(from_socket, buffer, sizeof(buffer), 0)) > 0) {
-        int bytes_sent = send(to_socket, buffer, bytes_received, 0);
-        if (bytes_sent <= 0) {
-            printf("Error sending data %s\n", direction);
-            break;
+        int bytes_sent = 0;
+        int total_sent = 0;
+        
+        while (total_sent < bytes_received) {
+            bytes_sent = send(to_socket, buffer + total_sent, 
+                            bytes_received - total_sent, 0);
+            if (bytes_sent < 0) {
+                printf("Error sending data\n");
+                return;
+            }
+            total_sent += bytes_sent;
         }
-        printf("Forwarded %d bytes %s\n", bytes_received, direction);
+        total_forwarded += bytes_received;
     }
     
-    printf("Done forwarding %s\n", direction);
+    printf("Forwarded %d bytes %s\n", total_forwarded, direction);
 }
 
-// Main function to handle one client
-void handle_client(SOCKET client_socket) {
+// Function to handle each client connection
+void handle_client(int client_socket) {
     char buffer[BUFFER_SIZE];
     
-    printf("\n=== New Client Connected ===\n");
+    printf("\n=== Handling Client (PID: %d) ===\n", getpid());
     
-    // Read request from client
+    // Read HTTP request from client
     int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) {
-        printf("ERROR: No data received from client!\n");
-        closesocket(client_socket);
+        printf("Failed to receive data from client\n");
+        close(client_socket);
         return;
     }
     
-    buffer[bytes_received] = '\0';  // Make it a proper string
+    buffer[bytes_received] = '\0';
     printf("Received %d bytes from client\n", bytes_received);
     
-    // Parse the HTTP request
+    // Parse the request
     HttpRequest request = parse_request(buffer);
+    
     if (!request.is_valid) {
-        send_error(client_socket, "Bad Request - Cannot parse your request");
-        closesocket(client_socket);
+        printf("Invalid HTTP request\n");
+        send_error(client_socket, "Invalid HTTP request");
+        close(client_socket);
         return;
     }
     
-    // Connect to the actual web server
-    SOCKET server_socket = connect_to_server(request.host, request.port);
-    if (server_socket == INVALID_SOCKET) {
+    printf("=== Parsed Request ===\n");
+    printf("Method: %s\n", request.method);
+    printf("Host: %s\n", request.host);
+    printf("Port: %d\n", request.port);
+    printf("Path: %s\n", request.path);
+    
+    // Connect to remote server
+    int server_socket = connect_to_server(request.host, request.port);
+    if (server_socket < 0) {
+        printf("Failed to connect to server\n");
         send_error(client_socket, "Cannot connect to requested server");
-        closesocket(client_socket);
+        close(client_socket);
         return;
     }
     
-    // Send original request to server
-    printf("\n=== Forwarding Request to Server ===\n");
-    if (send(server_socket, buffer, bytes_received, 0) <= 0) {
-        printf("ERROR: Cannot send request to server!\n");
-        closesocket(server_socket);
-        closesocket(client_socket);
+    // Forward original request to server
+    printf("Forwarding request to server...\n");
+    if (send(server_socket, buffer, bytes_received, 0) < 0) {
+        printf("Failed to send request to server\n");
+        close(server_socket);
+        close(client_socket);
         return;
     }
-    printf("✓ Request sent to server!\n");
     
-    // Forward response from server back to client
-    printf("\n=== Forwarding Response to Client ===\n");
+    // Forward response from server to client
     forward_data(server_socket, client_socket, "server->client");
     
-    // Clean up
-    closesocket(server_socket);
-    closesocket(client_socket);
     printf("✓ Client handled successfully!\n");
+    
+    // Clean up
+    close(server_socket);
+    close(client_socket);
 }
 
 int main(int argc, char* argv[]) {
-    printf("=== Simple HTTP Proxy Server ===\n");
-    
-    // Check command line arguments
     if (argc != 2) {
         printf("Usage: %s <port>\n", argv[0]);
         printf("Example: %s 8080\n", argv[0]);
@@ -287,73 +310,89 @@ int main(int argc, char* argv[]) {
     
     int port = atoi(argv[1]);
     if (port <= 0 || port > 65535) {
-        printf("Invalid port! Use a number between 1 and 65535.\n");
+        printf("Invalid port number. Must be between 1 and 65535.\n");
         return 1;
     }
     
-    // Initialize Windows sockets
-    if (!init_winsock()) {
+    // Set up signal handlers
+    signal(SIGCHLD, sigchld_handler);
+    signal(SIGINT, sigint_handler);
+    
+    // Create proxy socket
+    proxy_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (proxy_socket < 0) {
+        perror("Failed to create socket");
         return 1;
     }
     
-    // Create listening socket
-    SOCKET proxy_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (proxy_socket == INVALID_SOCKET) {
-        printf("ERROR: Cannot create proxy socket!\n");
-        cleanup_winsock();
+    // Set socket options
+    int opt = 1;
+    if (setsockopt(proxy_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("Failed to set socket options");
         return 1;
     }
     
-    // Set up address
+    // Bind to port
     struct sockaddr_in proxy_addr;
+    memset(&proxy_addr, 0, sizeof(proxy_addr));
     proxy_addr.sin_family = AF_INET;
-    proxy_addr.sin_addr.s_addr = INADDR_ANY;  // Listen on all interfaces
+    proxy_addr.sin_addr.s_addr = INADDR_ANY;
     proxy_addr.sin_port = htons(port);
     
-    // Bind socket to port
-    if (bind(proxy_socket, (struct sockaddr*)&proxy_addr, sizeof(proxy_addr)) == SOCKET_ERROR) {
-        printf("ERROR: Cannot bind to port %d! (Maybe it's already in use?)\n", port);
-        closesocket(proxy_socket);
-        cleanup_winsock();
+    if (bind(proxy_socket, (struct sockaddr*)&proxy_addr, sizeof(proxy_addr)) < 0) {
+        perror("Failed to bind socket");
+        printf("Port %d may already be in use\n", port);
         return 1;
     }
     
-    // Start listening
-    if (listen(proxy_socket, 5) == SOCKET_ERROR) {
-        printf("ERROR: Cannot listen on port %d!\n", port);
-        closesocket(proxy_socket);
-        cleanup_winsock();
+    // Listen for connections
+    if (listen(proxy_socket, 10) < 0) {
+        perror("Failed to listen");
         return 1;
     }
     
-    printf("✓ Proxy server is listening on port %d\n", port);
+    printf("=== Simple HTTP Proxy Server (Linux) ===\n");
+    printf("✓ Proxy server listening on port %d\n", port);
     printf("✓ Configure your browser to use 127.0.0.1:%d as HTTP proxy\n", port);
     printf("✓ Press Ctrl+C to stop the server\n\n");
     
-    // Main server loop - handle clients one by one (simple approach)
+    int client_count = 0;
+    
+    // Main server loop
     while (1) {
         struct sockaddr_in client_addr;
-        int client_len = sizeof(client_addr);
+        socklen_t client_len = sizeof(client_addr);
         
         printf("Waiting for client connection...\n");
         
-        // Accept a client connection
-        SOCKET client_socket = accept(proxy_socket, (struct sockaddr*)&client_addr, &client_len);
-        if (client_socket == INVALID_SOCKET) {
-            printf("ERROR: Failed to accept client connection!\n");
+        // Accept connection
+        int client_socket = accept(proxy_socket, (struct sockaddr*)&client_addr, &client_len);
+        if (client_socket < 0) {
+            if (errno == EINTR) continue; // Interrupted by signal
+            perror("Failed to accept connection");
             continue;
         }
         
-        printf("Client connected from %s\n", inet_ntoa(client_addr.sin_addr));
+        client_count++;
+        printf("✓ Client #%d connected from %s:%d\n", 
+               client_count, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
         
-        // Handle this client (one at a time for simplicity)
-        handle_client(client_socket);
-        
-        printf("\nReady for next client...\n");
+        // Fork child process to handle client
+        pid_t pid = fork();
+        if (pid == 0) {
+            // Child process
+            close(proxy_socket); // Child doesn't need listening socket
+            handle_client(client_socket);
+            exit(0);
+        } else if (pid > 0) {
+            // Parent process
+            close(client_socket); // Parent doesn't need client socket
+        } else {
+            // Fork failed
+            perror("Failed to fork");
+            close(client_socket);
+        }
     }
     
-    // Clean up (this won't be reached, but good practice)
-    closesocket(proxy_socket);
-    cleanup_winsock();
     return 0;
 }
