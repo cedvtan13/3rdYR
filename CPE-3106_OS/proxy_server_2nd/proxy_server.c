@@ -13,6 +13,7 @@
 #include <netdb.h>
 
 #define BUFFER_SIZE 4096
+#define SERVER_PORT 4444
 
 // extract host from HTTP request
 void getHostfromReq(char *request, char *host){
@@ -54,9 +55,7 @@ void handle_client(int client_fd) {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(80);
     memcpy(&server_addr.sin_addr, server->h_addr_list[0], server->h_length);
-    
     connect(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    
     printf("Connected to server!\n");
     
     // send the original request to the real server
@@ -74,10 +73,16 @@ void handle_client(int client_fd) {
 }
 
 int main(int argc, char *argv[]) {
-    int port = atoi(argv[1]);
+    int port = SERVER_PORT;
+    printf("Starting proxy server on port %d\n", port);
     
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     
+    /*  we need this for ease of use. It allows us to reuse the address.
+        Usually, when our server is stopped or terminates, the port is 
+        being in a time_wait state for awhile and if you try to restart the server,
+        it will say address already in use. This shi solves that problem.
+    */
     int yes = 1;
     setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
     
