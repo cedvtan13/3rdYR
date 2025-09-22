@@ -73,7 +73,8 @@ void handle_client(int client_fd) {
 }
 
 int main(int argc, char *argv[]) {
-    int port = SERVER_PORT;
+    //int port = SERVER_PORT;
+    int port = atoi(argv[1]); //if port should be set from command line
     printf("Starting proxy server on port %d\n", port);
     
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
