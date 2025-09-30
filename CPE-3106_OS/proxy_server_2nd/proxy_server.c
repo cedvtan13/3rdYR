@@ -13,7 +13,7 @@
 #include <netdb.h>
 
 #define BUFFER_SIZE 4096
-#define SERVER_PORT 4444
+// #define SERVER_PORT 4444
 
 //xtract host from HTTP request
 void getHostfromReq(char *request, char *host){
