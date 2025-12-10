@@ -1,5 +1,67 @@
 # Uniprocessor Scheduling Practice Exercises
 
+## Essential Formulas
+
+### Basic Timing Formulas
+```
+Completion Time (CT) = Time when process finishes execution
+
+Turnaround Time (TAT) = Completion Time - Arrival Time
+                      = CT - AT
+
+Waiting Time (WT) = Turnaround Time - Burst Time
+                  = TAT - BT
+                  = (CT - AT) - BT
+
+Response Time (RT) = Time when process first gets CPU - Arrival Time
+                   = First_Start_Time - AT
+```
+
+### Average Metrics
+```
+Average Turnaround Time = Σ(Turnaround Time) / Number of Processes
+                        = (TAT₁ + TAT₂ + ... + TATₙ) / n
+
+Average Waiting Time = Σ(Waiting Time) / Number of Processes
+                     = (WT₁ + WT₂ + ... + WTₙ) / n
+
+Average Response Time = Σ(Response Time) / Number of Processes
+                      = (RT₁ + RT₂ + ... + RTₙ) / n
+```
+
+### Algorithm-Specific Formulas
+
+**HRRN (Highest Response Ratio Next):**
+```
+Response Ratio (RR) = (Waiting Time + Burst Time) / Burst Time
+                    = (WT + BT) / BT
+                    = ((Current_Time - Arrival_Time) + BT) / BT
+
+Select process with HIGHEST Response Ratio
+```
+
+**CPU Utilization:**
+```
+CPU Utilization = (Total Busy Time / Total Time) × 100%
+                = ((Total Time - Idle Time) / Total Time) × 100%
+```
+
+**Throughput:**
+```
+Throughput = Number of Processes Completed / Total Time
+```
+
+### Quick Reference Table
+
+| Metric | Formula | What it Measures |
+|--------|---------|------------------|
+| **Turnaround Time** | CT - AT | Total time from arrival to completion |
+| **Waiting Time** | TAT - BT | Time spent waiting in ready queue |
+| **Response Time** | First_Start - AT | Time until first CPU allocation |
+| **Response Ratio** | (WT + BT) / BT | Priority for HRRN (higher = better) |
+
+---
+
 ## How to Use This Practice Program
 
 1. **Compile the program:**
@@ -240,29 +302,116 @@
 
 ---
 
+## Step-by-Step Calculation Guide
+
+### Example: Calculate Metrics for FCFS
+
+**Given Data:**
+| Process | Arrival Time | Burst Time |
+|---------|--------------|------------|
+| P1      | 0            | 4          |
+| P2      | 1            | 3          |
+| P3      | 2            | 1          |
+
+**Step 1: Create Gantt Chart**
+```
+| P1  | P2  | P3  |
+0     4     7     8
+```
+
+**Step 2: Find Completion Times (CT)**
+- P1: CT = 4
+- P2: CT = 7
+- P3: CT = 8
+
+**Step 3: Calculate Turnaround Time (TAT = CT - AT)**
+- P1: TAT = 4 - 0 = 4
+- P2: TAT = 7 - 1 = 6
+- P3: TAT = 8 - 2 = 6
+
+**Step 4: Calculate Waiting Time (WT = TAT - BT)**
+- P1: WT = 4 - 4 = 0
+- P2: WT = 6 - 3 = 3
+- P3: WT = 6 - 1 = 5
+
+**Step 5: Calculate Response Time (RT = First_Start - AT)**
+- P1: RT = 0 - 0 = 0
+- P2: RT = 4 - 1 = 3
+- P3: RT = 7 - 2 = 5
+
+**Step 6: Calculate Averages**
+- Avg TAT = (4 + 6 + 6) / 3 = 5.33
+- Avg WT = (0 + 3 + 5) / 3 = 2.67
+- Avg RT = (0 + 3 + 5) / 3 = 2.67
+
+---
+
+## Formula Quick Sheet (Print This!)
+
+```
+┌─────────────────────────────────────────────────┐
+│         CPU SCHEDULING FORMULAS                 │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│ TAT = CT - AT                                   │
+│ (Turnaround = Completion - Arrival)             │
+│                                                 │
+│ WT = TAT - BT = (CT - AT) - BT                  │
+│ (Waiting = Turnaround - Burst)                  │
+│                                                 │
+│ RT = First_Start - AT                           │
+│ (Response = First CPU time - Arrival)           │
+│                                                 │
+│ HRRN Response Ratio = (WT + BT) / BT            │
+│ (Higher ratio = Higher priority)                │
+│                                                 │
+│ Average = Sum of all values / n                 │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
+
+### Common Mistakes to Avoid
+❌ **Wrong:** WT = CT - BT (missing arrival time)  
+✅ **Correct:** WT = (CT - AT) - BT
+
+❌ **Wrong:** TAT = BT + WT (assumes no arrival delay)  
+✅ **Correct:** TAT = CT - AT
+
+❌ **Wrong:** Response Time = Waiting Time  
+✅ **Correct:** RT = First time CPU is allocated - AT
+
+---
+
 ## Tips for Your Exam
 
 1. **Always show your work:**
    - Draw Gantt charts
    - Show calculations for each metric
-   - Label clearly
+   - Label clearly (write CT, AT, BT, TAT, WT, RT)
 
-2. **Remember formulas:**
-   - Turnaround Time = Completion - Arrival
-   - Waiting Time = Turnaround - Burst
-   - Response Time = First_Run - Arrival
-   - Response Ratio = (Waiting + Burst) / Burst
+2. **Use the formulas in order:**
+   - Step 1: Draw Gantt chart → Find CT
+   - Step 2: TAT = CT - AT
+   - Step 3: WT = TAT - BT
+   - Step 4: RT = First_Start - AT
+   - Step 5: Calculate averages
 
-3. **Check for edge cases:**
+3. **Double-check your work:**
+   - WT should never be negative
+   - TAT ≥ BT (always!)
+   - Sum your averages calculation
+   - Verify with different formula: WT = (CT - AT) - BT
+
+4. **Check for edge cases:**
    - Processes arriving at different times
-   - CPU idle time
+   - CPU idle time (CT ≠ previous CT + BT)
    - Process starvation
 
-4. **Practice tracing:**
+5. **Practice tracing:**
    - Use this program to verify your manual calculations
    - Compare your answers with program output
 
-5. **Understand trade-offs:**
+6. **Understand trade-offs:**
    - No algorithm is best for everything
    - Know when to use each algorithm
 
