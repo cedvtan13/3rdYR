@@ -1,13 +1,13 @@
 # Members: Kent Vincent S. Godinez, Cedric Vince M. Tan
 # Updates:
-#   (12/8/2025) > created this client-server socket sonnection using TCP 
-#               > updated the code from Dr. Philip since it was not bi directional and the server can only send one message at a time.
-#               > based on AI study:
-#                   - this is a full duplex communication, which means that both sides can receive simultaneously
-#                   - multithreaded, since it uses threads to handle sending and receiving at the same time
-#               > initially i thought it was peer to peer but its not
-#   (12/8/2025) > added the RSA implementation for secure comms
-#   (12/12/2025)> added the cryptography library for better security practices
+#   (12/8/2025)     > created this client-server socket sonnection using TCP 
+#                   > updated the code from Dr. Philip since it was not bi directional and the server can only send one message at a time.
+#                   > based on AI study:
+#                       - this is a full duplex communication, which means that both sides can receive simultaneously
+#                       - multithreaded, since it uses threads to handle sending and receiving at the same time
+#                   > initially i thought it was peer to peer but its not
+#   (12/8/2025)     > added the RSA implementation for secure comms
+#   (12/12/2025)    > added the cryptography library for better security practices
 
 import socket
 import pickle
