@@ -171,6 +171,98 @@ def decrypt_message(package, recipient_private_key, sender_public_key):
 ## Main Section
 
 ### Send Message
+```python
+def sendMessage():
+    global run
+    while run:
+        try:
+            msg = input("Type Message: ")
+            if msg.lower() == 'exit' or msg.lower() == 'quit':
+                print("disconnectring...")
+                run = False
+                s.close()
+                break
+
+            package = encrypt_message(msg, server_public_key, client_private_key)
+
+            s.sendall(pickle.dumps(package))
+            
+        except socket.error as err:
+            run = False
+        except KeyboardInterrupt:
+            run = False
+            s.close()
 ```
 
+### Receive Message
+```python
+def receiveMsg():
+    global run
+    while run:
+        try:
+            data = s.recv(16384) #increase to 8192 for encrypted data
+            if not data:
+                run = False
+                break
+
+            # desrializzr the package
+            package = pickle.loads(data)
+            
+            decrypted_message, security_status = decrypt_message(
+                package,
+                client_private_key,
+                server_public_key
+            )
+
+            if decrypted_message:
+                print(f"\r{' '* 80}\rMessage: {decrypted_message}")
+                print(f"Security: {security_status}")
+            else:
+                print(f"\r{' '* 80}\r{security_status}")
+            
+            print("Type Message: ", end='', flush=True)
+
+        except socket.error as msg:
+            run = False
+        except KeyboardInterrupt:
+            run = False
+```
+---
+## Key Generation
+
+### Client Public Key Generation
+```python
+client_private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+    backend=default_backend()
+)
+client_public_key = client_private_key.public_key()
+```
+
+### Server Public Key Generation
+```python
+  server_private_key = rsa.generate_private_key(
+      public_exponent=65537,
+      key_size=2048,
+      backend=default_backend()
+  ) 
+  server_public_key = server_private_key.public_key()
+```
+
+---
+## Receiving of Public Key
+### Client
+```py
+server_public_key = serialization.load_pem_public_key(
+    server_public_key_bytes,
+    backend=default_backend()
+)
+```
+### Server
+```py
+client_public_key = serialization.load_pem_public_key(
+    client_public_key_bytes,
+    backend=default_backend()
+)
 ```
