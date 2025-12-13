@@ -23,7 +23,7 @@ A secure real-time chat application implementing hybrid encryption (AES + RSA) w
 ## Helper Functions
 
 ### Encrypt Mssage
-'''
+```python
 def encrypt_message(message, recipient_public_key, sender_private_key):
     '''
     hybrid encryption:
@@ -84,9 +84,9 @@ def encrypt_message(message, recipient_public_key, sender_private_key):
         'signature': signature,
         'hmac': hmac_tag
     }
-'''
+```
 ### Decrypt Message
-'''
+```python
 def decrypt_message(package, recipient_private_key, sender_public_key):
     '''
     hybrid decryption:
@@ -166,11 +166,11 @@ def decrypt_message(package, recipient_private_key, sender_public_key):
     security_status = f"{hmac_status} | {timestamp_status} | {signature_status}"
 
     return message, security_status
-'''
+```
 
 ## Main Section
 
 ### Send Message
-'''
+```
 
-'''
+```
