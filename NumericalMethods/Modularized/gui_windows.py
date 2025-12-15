@@ -1,7 +1,5 @@
 """
 GUI WINDOW HELPERS
-Creates popup windows for each numerical method
-Keeps the main GUI file cleaner
 """
 
 import tkinter as tk
@@ -158,11 +156,13 @@ def create_differentiation_window(parent_gui):
             # Calculate using different methods
             forward = differentiate_function(x, h, 'forward')
             central = differentiate_function(x, h, 'central')
+            backward = differentiate_function(x, h, 'backward')
             exact = exact_derivative(x)
             
             parent_gui.log_output(f"\nx = {x}, h = {h}")
             parent_gui.log_output(f"Exact derivative: {exact:.6f}")
             parent_gui.log_output(f"Forward difference: {forward:.6f}")
+            parent_gui.log_output(f"Backward difference: {backward:.6f}")
             parent_gui.log_output(f"Central difference: {central:.6f}")
             
             messagebox.showinfo("Done", "Results shown in output!")

@@ -696,6 +696,499 @@ You've taken the first step! 🚀
 
 ---
 
+# FLOWCHARTS FOR NUMERICAL METHODS GUI
+
+## 1. MAIN APPLICATION STRUCTURE (NumericalMethodsGUI)
+
+```
+START
+  |
+  v
+Initialize Main Window
+  |
+  v
+Create Title Label
+"NUMERICAL METHODS LEARNING TOOL"
+  |
+  v
+Create Button Frame
+  |
+  v
+Add 5 Method Buttons:
+├─> Button 1: Gaussian Elimination
+├─> Button 2: Numerical Differentiation  
+├─> Button 3: Linear Regression
+├─> Button 4: Polynomial Regression
+└─> Button 5: 3D Multiple Regression
+  |
+  v
+Create Output Text Area
+(Scrollable text box for results)
+  |
+  v
+Wait for User Input
+  |
+  v
+User Clicks Button? ──No──> Keep Waiting
+  |                          |
+  Yes                        |
+  |<─────────────────────────┘
+  v
+Open Corresponding Window
+  |
+  v
+Process User Data in Window
+  |
+  v
+Display Results in Output Area
+  |
+  v
+Return to Main Menu
+  |
+  v
+User Clicks Exit? ──No──> Wait for User Input
+  |                       |
+  Yes                     |
+  |<──────────────────────┘
+  v
+END
+```
+
+---
+
+## 2. GAUSSIAN ELIMINATION
+
+```
+START
+  |
+  v
+Open Gaussian Window
+  |
+  v
+Ask: "Number of variables (2-5)?"
+  |
+  v
+User Enters Number (n)
+  |
+  v
+Valid (2≤n≤5)? ──No──> Show Error
+  |                     |
+  Yes                   |
+  |<────────────────────┘
+  v
+Create n Input Rows
+Each row has:
+├─> n coefficient boxes
+└─> 1 answer box
+  |
+  v
+User Fills All Boxes
+  |
+  v
+User Clicks "Solve"
+  |
+  v
+Read All Values
+  |
+  v
+Convert to Matrix A (coefficients)
+Convert to Vector b (answers)
+  |
+  v
+Call solve_gaussian(A, b)
+  |
+  v
+Use numpy.linalg.solve()
+(Gaussian elimination internally)
+  |
+  v
+Solution Found? ──No──> Show "Cannot Solve"
+  |                      Return to Input
+  Yes                    |
+  |<─────────────────────┘
+  v
+Display Solutions:
+x = value1
+y = value2
+z = value3
+(etc.)
+  |
+  v
+Show Success Message
+  |
+  v
+END
+```
+
+**Example:**
+```
+Input: 2x + 3y = 8
+       x - y = 1
+
+Matrix A = [[2, 3],    Vector b = [8,
+            [1,-1]]                1]
+
+Output: x = 2.2, y = 1.2
+```
+
+---
+
+## 3. NUMERICAL DIFFERENTIATION
+
+```
+START
+  |
+  v
+Open Differentiation Window
+  |
+  v
+Display Function: f(x) = x² + 2x + 1
+  |
+  v
+Ask User for:
+├─> x value (point to find derivative)
+└─> h value (step size, default 0.01)
+  |
+  v
+User Enters Values
+  |
+  v
+User Clicks "Calculate"
+  |
+  v
+Calculate Exact Derivative
+exact = 2x + 2
+  |
+  v
+Calculate Forward Difference
+forward = [f(x+h) - f(x)] / h
+  |
+  v
+Calculate Backward Difference
+backward = [f(x) - f(x-h)] / h
+  |
+  v
+Calculate Central Difference
+central = [f(x+h) - f(x-h)] / (2h)
+  |
+  v
+Display All Results:
+├─> Exact: (exact value)
+├─> Forward: (forward value)
+├─> Backward: (backward value)
+└─> Central: (central value - most accurate)
+  |
+  v
+Show Success Message
+  |
+  v
+END
+```
+
+**Visual Explanation:**
+```
+Forward:  x ────────> x+h
+          look ahead
+
+Backward: x-h <────── x
+          look behind
+
+Central:  x-h <──x──> x+h
+          look both ways (best!)
+```
+
+---
+
+## 4. LINEAR REGRESSION
+
+```
+START
+  |
+  v
+Open Linear Regression Window
+  |
+  v
+Show Default Data:
+X: [1, 2, 3, 4, 5]
+Y: [2, 4, 5, 4, 5]
+  |
+  v
+User Can Enter Custom Data
+(comma separated values)
+  |
+  v
+User Clicks "Calculate & Plot"
+  |
+  v
+Parse X and Y values
+  |
+  v
+Check: Same Length? ──No──> Show Error
+  |                          Return to Input
+  Yes                        |
+  |<─────────────────────────┘
+  v
+Check: At Least 2 Points? ──No──> Show Error
+  |                                Return
+  Yes                              |
+  |<───────────────────────────────┘
+  v
+Calculate Sums:
+├─> sum_x = Σx
+├─> sum_y = Σy
+├─> sum_xy = Σ(x*y)
+└─> sum_x2 = Σ(x²)
+  |
+  v
+Calculate Slope (m):
+m = (n*sum_xy - sum_x*sum_y) / (n*sum_x2 - sum_x²)
+  |
+  v
+Calculate Intercept (b):
+b = (sum_y - m*sum_x) / n
+  |
+  v
+Best Line: y = mx + b
+  |
+  v
+Create Plot:
+├─> Red dots = data points
+└─> Blue line = best fit
+  |
+  v
+Display Equation and Graph
+  |
+  v
+END
+```
+
+**Visual:**
+```
+     Y
+     |     • (data point)
+   5 |   •   • 
+   4 | •   •     Line: y = 0.8x + 1.2
+   3 |•
+   2 |────────────────> X
+     1   2   3   4   5
+```
+
+---
+
+## 5. POLYNOMIAL REGRESSION
+
+```
+START
+  |
+  v
+Open Polynomial Regression Window
+  |
+  v
+Show Default Data:
+X: [1, 2, 3, 4, 5]
+Y: [1, 4, 9, 16, 23]
+Degree: 2
+  |
+  v
+User Enters:
+├─> X values (comma separated)
+├─> Y values (comma separated)
+└─> Degree (1-4)
+  |
+  v
+User Clicks "Calculate & Plot"
+  |
+  v
+Parse All Values
+  |
+  v
+Check: Same Length? ──No──> Show Error
+  |                          Return
+  Yes                        |
+  |<─────────────────────────┘
+  v
+Check: Enough Points? ──No──> Show Error
+(need degree + 1 points)     Return
+  |                          |
+  Yes                        |
+  |<─────────────────────────┘
+  v
+Check: Degree 1-4? ──No──> Show Error
+  |                         Return
+  Yes                       |
+  |<────────────────────────┘
+  v
+Call numpy.polyfit(x, y, degree)
+Returns coefficients
+  |
+  v
+Create Polynomial Function
+If degree=2: y = ax² + bx + c
+If degree=3: y = ax³ + bx² + cx + d
+  |
+  v
+Generate Smooth Curve
+(200 points for plotting)
+  |
+  v
+Create Plot:
+├─> Black dots = data points
+└─> Blue curve = polynomial fit
+  |
+  v
+Display Equation and Graph
+  |
+  v
+END
+```
+
+**Degree Examples:**
+```
+Degree 1: Line        y = mx + b
+Degree 2: Parabola    y = ax² + bx + c
+Degree 3: Cubic       y = ax³ + bx² + cx + d
+```
+
+---
+
+## 6. 3D MULTIPLE REGRESSION
+
+```
+START
+  |
+  v
+Open 3D Regression Window
+  |
+  v
+Show Default Data:
+X: [1000, 1500, 2000, ...] (e.g., house size)
+Y: [5, 10, 3, ...]         (e.g., age)
+Z: [150, 200, 280, ...]    (e.g., price)
+  |
+  v
+User Enters Custom 3D Data
+(comma separated)
+  |
+  v
+User Clicks "Calculate & Plot 3D"
+  |
+  v
+Parse X, Y, Z values
+  |
+  v
+Check: All Same Length? ──No──> Show Error
+  |                              Return
+  Yes                            |
+  |<─────────────────────────────┘
+  v
+Check: At Least 3 Points? ──No──> Show Error
+  |                                Return
+  Yes                              |
+  |<───────────────────────────────┘
+  v
+Build Design Matrix A:
+Each row = [x_i, y_i, 1]
+  |
+  v
+Solve Using Least Squares:
+A * [a, b, c]ᵀ = z
+  |
+  v
+Get Coefficients:
+├─> a (effect of x on z)
+├─> b (effect of y on z)
+└─> c (constant term)
+  |
+  v
+Best Plane: z = a*x + b*y + c
+  |
+  v
+Calculate R² (goodness of fit):
+├─> Predicted z values
+├─> Residual sum of squares
+└─> R² = 1 - (SS_res / SS_tot)
+  |
+  v
+Create 3D Mesh Grid
+for plane surface
+  |
+  v
+Create 3D Plot:
+├─> Red spheres = data points
+└─> Blue surface = best-fit plane
+  |
+  v
+Display Results:
+├─> Plane equation
+├─> R² value
+└─> Interpretations
+  |
+  v
+Show 3D Graph
+  |
+  v
+END
+```
+
+**Visual Concept:**
+```
+        Z
+        |
+        |    • data point
+        |  •  /
+        | •  / (plane)
+        |•  /___
+        | /___/___
+       /_________> Y
+      /
+     / X
+
+Plane: z = a*x + b*y + c
+```
+
+**Interpretation:**
+- **a**: How much Z changes per unit of X
+- **b**: How much Z changes per unit of Y  
+- **c**: Base value when X=0, Y=0
+- **R²**: 0.0 (bad fit) to 1.0 (perfect fit)
+
+---
+
+## SUMMARY OF ALGORITHMS
+
+| Method | Input | Output | Use Case |
+|--------|-------|--------|----------|
+| Gaussian Elimination | System of equations | Variable values | Solve 2-5 unknowns |
+| Differentiation | x, h, function | Derivative | Rate of change |
+| Linear Regression | (x,y) points | Line y=mx+b | Trend line |
+| Polynomial Regression | (x,y) points, degree | Curve equation | Non-linear fit |
+| 3D Multiple Regression | (x,y,z) points | Plane equation | Multi-variable prediction |
+
+---
+
+## NOTES FOR STUDENTS
+
+### Complexity Levels:
+1. **Gaussian**: Moderate (matrix operations)
+2. **Differentiation**: Easy (simple formulas)
+3. **Linear Regression**: Easy (basic math)
+4. **Polynomial**: Moderate (uses numpy)
+5. **3D Multiple**: Advanced (matrix + visualization)
+
+### Common Errors to Avoid:
+- Not enough data points
+- Mismatched array lengths
+- Division by zero in formulas
+- Invalid degree for polynomial
+- Singular matrices in Gaussian
+
+### Testing Tips:
+- Start with simple examples
+- Verify with known answers
+- Check extreme cases
+- Compare numerical vs analytical results
+```
+
 ## 📝 References
 
 1. Burden, R. L., & Faires, J. D. (2010). *Numerical Analysis* (9th ed.). Brooks/Cole.

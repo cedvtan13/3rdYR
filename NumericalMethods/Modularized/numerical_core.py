@@ -1,25 +1,21 @@
-"""
-NUMERICAL CORE FUNCTIONS
-Contains all the mathematical methods
-Simple, well-commented functions for learning
-"""
+
+# NUMERICAL CORE FUNCTIONS
+
 
 import numpy as np
 
 # ========================================
-# GAUSSIAN ELIMINATION
-# Solves systems of linear equations
+# GAUSSIAN ELIM
 # ========================================
 
 def solve_gaussian(equations, answers):
-    """
-    Solve system of equations using Gaussian Elimination
+    # Solve system of equations using Gaussian Elimination
     
-    equations: list of lists [[2,3], [1,-1]] means 2x+3y, x-y
-    answers: list [8, 1] means = 8, = 1
+    # equations: list of lists [[2,3], [1,-1]] means 2x+3y, x-y
+    # answers: list [8, 1] means = 8, = 1
     
-    Returns: list of solutions [x, y] or None if can't solve
-    """
+    # Returns: list of solutions [x, y] or None if can't solve
+    
     try:
         # Convert to numpy arrays for calculation
         A = np.array(equations)  # Coefficient matrix
@@ -34,20 +30,19 @@ def solve_gaussian(equations, answers):
 
 
 # ========================================
-# NUMERICAL DIFFERENTIATION
-# Finds the slope/derivative at a point
+# NUMERICAL DIFF
 # ========================================
 
 def differentiate_function(x, h, method='central'):
-    """
-    Calculate derivative of f(x) = x² + 2x + 1
+
+    # Calculate derivative of f(x) = x² + 2x + 1
     
-    x: point where we want the derivative
-    h: step size (small number like 0.01)
-    method: 'forward', 'backward', or 'central'
+    # x: point where we want the derivative
+    # h: step size (small number like 0.01)
+    # method: 'forward', 'backward', or 'central'
     
-    Returns: approximate derivative value
-    """
+    # Returns: approximate derivative value
+
     # Define the function
     def f(x):
         return x**2 + 2*x + 1
@@ -66,29 +61,28 @@ def differentiate_function(x, h, method='central'):
 
 
 def exact_derivative(x):
-    """
-    Exact derivative of f(x) = x² + 2x + 1
-    This is f'(x) = 2x + 2
-    Used for comparison with numerical methods
-    """
+
+    # Exact derivative of f(x) = x² + 2x + 1
+    # This is f'(x) = 2x + 2
+    # Used for comparison with numerical methods
+
     return 2*x + 2
 
 
 # ========================================
-# LINEAR REGRESSION
-# Find best-fit line through data points
+# LINEAR REG
 # ========================================
 
 def linear_regression(x_points, y_points):
-    """
-    Find best line y = mx + b through points
-    Uses analytical method (direct formula)
+
+    # Find best line y = mx + b through points
+    # Uses analytical method (direct formula)
     
-    x_points: list of x coordinates [1, 2, 3, 4, 5]
-    y_points: list of y coordinates [2, 4, 5, 4, 5]
+    # x_points: list of x coordinates [1, 2, 3, 4, 5]
+    # y_points: list of y coordinates [2, 4, 5, 4, 5]
     
-    Returns: (m, b) where m is slope, b is y-intercept
-    """
+    # Returns: (m, b) where m is slope, b is y-intercept
+
     n = len(x_points)
     
     # Calculate sums needed for formulas
@@ -107,20 +101,19 @@ def linear_regression(x_points, y_points):
 
 
 # ========================================
-# POLYNOMIAL REGRESSION
-# Fit curves (not just lines) to data
+# POLY REG
 # ========================================
 
 def polynomial_regression(x_points, y_points, degree):
-    """
-    Find best polynomial curve through points
+
+    # Find best polynomial curve through points
     
-    degree = 1: line (y = mx + b)
-    degree = 2: parabola (y = ax² + bx + c)
-    degree = 3: cubic curve
+    # degree = 1: line (y = mx + b)
+    # degree = 2: parabola (y = ax² + bx + c)
+    # degree = 3: cubic curve
     
-    Returns: (coefficients, polynomial_function)
-    """
+    # Returns: (coefficients, polynomial_function)
+
     # Use numpy's polyfit to find coefficients
     coefficients = np.polyfit(x_points, y_points, degree)
     
@@ -131,22 +124,21 @@ def polynomial_regression(x_points, y_points, degree):
 
 
 # ========================================
-# 3D MULTIPLE REGRESSION
-# Predict Z from X and Y variables
+# 3D MULT REG
 # ========================================
 
 def multiple_regression_3d(x_data, y_data, z_data):
-    """
-    Find best plane through 3D points: z = a*x + b*y + c
+ 
+    # Find best plane through 3D points: z = a*x + b*y + c
     
-    Example: Predict house price (z) from size (x) and age (y)
+    # Example: Predict house price (z) from size (x) and age (y)
     
-    Returns: (a, b, c, r_squared)
-    - a: coefficient for x
-    - b: coefficient for y
-    - c: constant term
-    - r_squared: goodness of fit (0 to 1, higher is better)
-    """
+    # Returns: (a, b, c, r_squared)
+    # - a: coefficient for x
+    # - b: coefficient for y
+    # - c: constant term
+    # - r_squared: goodness of fit (0 to 1, higher is better)
+
     n = len(x_data)
     
     # Build design matrix: each row is [x, y, 1]

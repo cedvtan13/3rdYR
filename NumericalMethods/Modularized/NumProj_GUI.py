@@ -1,6 +1,5 @@
 """
 NUMERICAL METHODS GUI APPLICATION - MAIN FILE
-Clean, modular version that imports helper modules
 """
 
 import tkinter as tk

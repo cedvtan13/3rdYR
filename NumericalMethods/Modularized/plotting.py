@@ -1,7 +1,5 @@
 """
 PLOTTING FUNCTIONS
-Creates all the graphs and visualizations
-Simple matplotlib code for students to understand
 """
 
 import numpy as np
@@ -9,7 +7,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # ========================================
-# LINEAR REGRESSION PLOT
+# LINEAR REG
 # ========================================
 
 def plot_linear_regression(x_points, y_points, m, b):
@@ -44,7 +42,7 @@ def plot_linear_regression(x_points, y_points, m, b):
 
 
 # ========================================
-# POLYNOMIAL REGRESSION PLOT
+# POLYNOMIAL REG
 # ========================================
 
 def plot_polynomial_regression(x_points, y_points, degree, poly_function):
@@ -81,7 +79,7 @@ def plot_polynomial_regression(x_points, y_points, degree, poly_function):
 
 
 # ========================================
-# 3D MULTIPLE REGRESSION PLOT
+# 3D MULTIPLE REG
 # ========================================
 
 def plot_3d_regression(x_data, y_data, z_data, a, b, c):
