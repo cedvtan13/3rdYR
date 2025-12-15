@@ -11,7 +11,7 @@
 **[Screen: Main GUI window visible]**
 
 **Member 1:**
-> "Hello everyone! Welcome to our CPE 3108 Machine Learning project demonstration. Today we're presenting 'Understanding Machine Learning Libraries: A Comparative Implementation of Analytical and Iterative Regression Algorithms.'"
+> "Hello everyone! Welcome to our Machine Learning project demonstration. Today we're presenting 'Understanding Machine Learning Libraries: A Comparative Implementation of Analytical and Iterative Regression Algorithms.'"
 
 **[Highlight each button as mentioned]**
 
