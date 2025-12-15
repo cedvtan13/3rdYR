@@ -2,7 +2,7 @@
 ## Understanding Machine Learning Libraries: A Comparative Implementation of Analytical and Iterative Regression Algorithms
 
 **Duration Target:** 6 minutes  
-**Group Members:** [Member 1], [Member 2], [Member 3], [Member 4]
+**Group Members:** [Member 1], [Member 2]
 
 ---
 
@@ -82,12 +82,12 @@ Equation 2: 1x - 1y = 1
 
 ---
 
-## 📊 PART 2: NUMERICAL DIFFERENTIATION (1 minute 15 seconds) - Member 2
+## 📊 PART 2: NUMERICAL DIFFERENTIATION (1 minute 15 seconds) - Member 1
 
 **[Return to main menu, click "Numerical Differentiation"]**
 
-**Member 2:**
-> "I'll now demonstrate Numerical Differentiation - a crucial technique that powers gradient descent in machine learning. Our program uses the function f(x) = x² + 2x + 1."
+**Member 1:**
+> "Now I'll demonstrate Numerical Differentiation - a crucial technique that powers gradient descent in machine learning. Our program uses the function f(x) = x² + 2x + 1, and meets the professor's requirement of user-selectable differentiation methods."
 
 **[Differentiation window opens]**
 
@@ -95,8 +95,8 @@ Equation 2: 1x - 1y = 1
 
 **[Enter x = 2, h = 0.01]**
 
-**Member 2:**
-> "Let's calculate the derivative at x equals 2, using step size h equals 0.01. Watch as we compare all three differentiation methods."
+**Member 1:**
+> "Let's calculate the derivative at x equals 2, using step size h equals 0.01. Watch as we compare all three differentiation methods available to the user."
 
 **[Click "Calculate"]**
 
@@ -118,7 +118,7 @@ Exact Derivative: 6.00
 
 **[Enter x = 3, h = 0.1 (larger step)]**
 
-**Member 2:**
+**Member 1:**
 > "Now let's demonstrate how step size affects accuracy. Using a larger h of 0.1..."
 
 **[Click "Calculate"]**
@@ -129,17 +129,17 @@ Exact Derivative: 6.00
 
 **[Enter x = -1, h = 0.001 (very small)]**
 
-**Member 2:**
+**Member 1:**
 > "And with a very small step size at x equals negative 1, we achieve near-perfect precision. This differentiation method is exactly how neural networks calculate gradients during backpropagation!"
 
 ---
 
-## 📈 PART 3: LINEAR & POLYNOMIAL REGRESSION (1 minute 30 seconds) - Member 3
+## 📈 PART 3: LINEAR & POLYNOMIAL REGRESSION (1 minute 30 seconds) - Member 2
 
 **[Return to main menu, click "Linear Regression"]**
 
-**Member 3:**
-> "Moving on to regression analysis - the heart of predictive modeling. I'll demonstrate both linear and polynomial regression."
+**Member 2:**
+> "Moving on to regression analysis - the heart of predictive modeling. I'll demonstrate both linear and polynomial regression, showcasing the analytical methods that form the foundation of machine learning."
 
 ### Linear Regression - Standard Case
 
@@ -149,7 +149,7 @@ X: 1, 2, 3, 4, 5
 Y: 2, 4, 5, 4, 5
 ```
 
-**Member 3:**
+**Member 2:**
 > "Here's a typical dataset - five x-y coordinate pairs. Our analytical method will find the best-fit line using direct mathematical formulas."
 
 **[Click "Calculate & Plot"]**
@@ -168,7 +168,7 @@ Y: 2, 4, 5, 4, 5
 
 **[Click back to menu, select "Polynomial Regression"]**
 
-**Member 3:**
+**Member 2:**
 > "Now let's fit curves, not just lines. I'll demonstrate with data that follows a parabolic pattern."
 
 **[Enter data:]**
@@ -201,11 +201,11 @@ Y: 1, 4, 9, 16, 25
 
 ---
 
-## 🎯 PART 4: 3D MULTIPLE REGRESSION (1 minute 15 seconds) - Member 4
+## 🎯 PART 4: 3D MULTIPLE REGRESSION (1 minute 15 seconds) - Member 2
 
 **[Return to menu, click "3D Multiple Regression"]**
 
-**Member 4:**
+**Member 2:**
 > "Finally, I'll demonstrate 3D Multiple Regression - predicting one variable from two inputs. Think of it as finding the best plane through 3D space."
 
 ### Real-World Scenario: House Prices
@@ -217,7 +217,7 @@ Y (Age in years): 5, 10, 3, 15, 8, 2, 12, 7
 Z (Price in $1000s): 150, 200, 280, 220, 320, 170, 210, 260
 ```
 
-**Member 4:**
+**Member 2:**
 > "Let's predict house prices using two variables: size in square feet and age in years. This demonstrates multiple regression - using multiple features to make predictions."
 
 **[Click "Calculate & Plot 3D"]**
@@ -257,16 +257,16 @@ Z: 10, 20, 15, 25, 18
 
 **[Shows R² = 0.35]**
 
-**Member 4:**
+**Member 2:**
 > "Here's a special case - random data with no real relationship. Our R-squared is only 0.35, indicating poor predictive power. The model still works, but it tells us these variables don't meaningfully predict the outcome."
 
 ---
 
-## 💻 PART 5: IMPLEMENTATION & CODE ARCHITECTURE (45 seconds) - Member 1
+## 💻 PART 5: IMPLEMENTATION & CODE ARCHITECTURE (45 seconds) - Member 2
 
 **[Screen: Show code file structure]**
 
-**Member 1:**
+**Member 2:**
 > "Let me quickly walk you through our code architecture. We followed a modular design for maintainability and educational clarity."
 
 **[Show numerical_core.py]**
@@ -291,23 +291,17 @@ Z: 10, 20, 15, 25, 18
 
 ---
 
-## 🎓 CONCLUSION (30 seconds) - All Members (Split lines)
+## 🎓 CONCLUSION (30 seconds) - Both Members
 
 **[Screen: Return to main GUI]**
 
-**Member 2:**
-> "To summarize, our project demonstrates the foundational numerical methods behind machine learning:"
-
-**Member 3:**
-> "From solving equation systems with Gaussian elimination, to calculating derivatives for optimization,"
-
-**Member 4:**
-> "To fitting models with analytical regression techniques that power modern predictive algorithms."
-
 **Member 1:**
-> "We've shown various input scenarios, special edge cases, and the clean implementation that makes these concepts accessible for learning."
+> "To summarize, our project demonstrates the foundational numerical methods behind machine learning - from solving equation systems with Gaussian elimination up to 5 unknowns, to calculating derivatives using user-selectable differentiation methods."
 
-**All Members:**
+**Member 2:**
+> "To fitting models with analytical regression techniques that power modern predictive algorithms. We've shown various input scenarios, special edge cases, and the clean modular implementation that makes these concepts accessible for learning."
+
+**Both Members:**
 > "Thank you for watching! Questions are welcome."
 
 **[Screen: Fade to credits showing team member names and GitHub repository]**
@@ -320,12 +314,16 @@ Z: 10, 20, 15, 25, 18
 |---------|----------|-----------|
 | Introduction | 0:30 | Member 1 |
 | Gaussian Elimination | 1:15 | Member 1 |
-| Numerical Differentiation | 1:15 | Member 2 |
-| Linear & Polynomial Regression | 1:30 | Member 3 |
-| 3D Multiple Regression | 1:15 | Member 4 |
-| Implementation Overview | 0:45 | Member 1 |
-| Conclusion | 0:30 | All |
+| Numerical Differentiation | 1:15 | Member 1 |
+| Linear & Polynomial Regression | 1:30 | Member 2 |
+| 3D Multiple Regression | 1:15 | Member 2 |
+| Implementation Overview | 0:45 | Member 2 |
+| Conclusion | 0:30 | Both |
 | **TOTAL** | **6:00** | |
+
+### Speaking Time per Member
+- **Member 1:** ~3:00 (Introduction, Gaussian, Differentiation, Conclusion)
+- **Member 2:** ~3:30 (Linear/Poly Regression, 3D Regression, Implementation, Conclusion)
 
 ---
 
@@ -345,8 +343,8 @@ Z: 10, 20, 15, 25, 18
 
 ### Special Scenarios to Emphasize
 1. **Gaussian:** 5-variable system, no-solution case
-2. **Differentiation:** Central difference accuracy, step size effects
-3. **Linear Regression:** Visual fit quality
+2. **Differentiation:** All three methods comparison, Central difference accuracy
+3. **Linear Regression:** Visual fit quality, analytical formula
 4. **Polynomial:** Underfitting vs overfitting comparison
 5. **3D Regression:** R-squared interpretation, poor correlation case
 
@@ -373,8 +371,9 @@ Z: 10, 20, 15, 25, 18
 - [ ] Multiple input scenarios for each feature
 - [ ] Special/edge cases included
 - [ ] Implementation code shown
-- [ ] Each member has significant speaking part
+- [ ] Both members have significant speaking parts (~3 minutes each)
 - [ ] Under 6-minute duration
+- [ ] Professor requirements met (5 unknowns, user-selectable differentiation)
 
 ### Technical Quality
 - [ ] Screen recording at 1080p
@@ -397,17 +396,25 @@ Z: 10, 20, 15, 25, 18
 **If doing picture-in-picture format:**
 
 **Member 1:**
-> "Hi, I'm [Name], and I'll be demonstrating Gaussian Elimination and our implementation architecture."
+> "Hi, I'm [Name], and I'll be demonstrating Gaussian Elimination and Numerical Differentiation - the core computational methods that solve equations and calculate derivatives for optimization."
 
 **Member 2:**
-> "I'm [Name], and I'll show you how numerical differentiation works in our project."
-
-**Member 3:**
-> "Hello, I'm [Name], covering linear and polynomial regression."
-
-**Member 4:**
-> "And I'm [Name], demonstrating 3D multiple regression and real-world applications."
+> "And I'm [Name], covering regression analysis including linear, polynomial, and 3D multiple regression, plus our implementation architecture. Together we'll show you how these methods form the foundation of machine learning."
 
 ---
 
-**Good luck with your video production! This script should keep you right at the 6-minute mark while covering all required elements comprehensively.**
+## 💡 TRANSITION PHRASES TO USE
+
+**Between Member 1 & 2:**
+> Member 1: "Now I'll hand it over to my partner to demonstrate our regression implementations."
+
+**If Member 2 needs to take over screen:**
+> Member 2: "Thanks! Let me show you how we apply these principles to regression analysis..."
+
+**During handoff in conclusion:**
+> Member 1: "So to wrap up our demonstration..."
+> Member 2: "And before we close, I want to emphasize..."
+
+---
+
+**Good luck with your video production! This 2-member version balances the workload evenly while covering all required elements comprehensively.**
