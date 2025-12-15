@@ -26,7 +26,7 @@
 **[Click "Gaussian Elimination" button]**
 
 **Member 1:**
-> "First, let's demonstrate Gaussian Elimination - the method for solving systems of linear equations. Our professor required this to handle up to 5 unknowns."
+> "First, let's demonstrate Gaussian Elimination - the method for solving systems of linear equations. According to the conditions, we were required this to handle up to 5 unknowns."
 
 **[Enter number of variables: 2]**
 **[Click "Create Input Fields"]**
