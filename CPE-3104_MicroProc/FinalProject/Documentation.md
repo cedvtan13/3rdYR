@@ -31,9 +31,10 @@ This document provides comprehensive context for an AI tutor to teach a student 
 ### Student Information
 - **Username**: cedvtan13
 - **Course**: CPE-3104 Microprocessor Systems (Third Year)
+- **Repository**: cedvtan13/3rdYR (Information Engineering Codes)
 - **Project Name**:  Classroom Power Control System
 - **Learning Stage**: First-time microprocessor and assembly language student
-- **Development Environment**: Proteus 8.11 simulator with MASM32 assembler
+- **Development Environment**: Proteus 8. 11 simulator with MASM32 assembler
 - **Project Status**: Code is complete and functional
 
 ### Student's Learning Style
@@ -51,7 +52,7 @@ Be prepared to clarify:
 - Why transistors are needed for relay control (current amplification)
 - Why address decoding is needed for I/O but not memory in Proteus
 - How the multiplexed address/data bus works
-- When to use IN/OUT vs. MOV instructions
+- When to use IN/OUT vs.  MOV instructions
 - Read-modify-write pattern for partial port updates
 - Why passwords are stored as ASCII instead of binary
 
@@ -61,7 +62,7 @@ Be prepared to clarify:
 
 ### What the System Does
 
-**Classroom Power Control System** - A password-protected embedded system that manages three electrical power branches in a classroom:
+**Classroom Power Control System** - A password-protected embedded system that manages three electrical power branches in a classroom: 
 
 1. **AC Units** - Climate control systems
 2. **Power Outlets** - Student/faculty device charging, projector power
@@ -88,7 +89,7 @@ Be prepared to clarify:
 - **Shutdown delay timer**:  0-9 minutes before power cuts
   - Purpose: Allows LCD projectors to cool down
   - Purpose: Gives time for safe classroom exit with lights on
-  - Cancellable:  Hardware button or # key aborts
+  - Cancellable: Hardware button or # key aborts
 - **Relay feedback verification**: Confirms relays actually switched
 - **Default safe state**: All devices OFF on power-up/reset
 
@@ -96,7 +97,7 @@ Be prepared to clarify:
 - 20×4 LCD display for all interactions
 - 4×4 matrix keypad for input
 - Visual countdown during timer operation
-- Clear status indicators (1. AC:  ON, 2.PWR: OFF, etc.)
+- Clear status indicators (1. AC: ON, 2.PWR: OFF, etc.)
 
 ---
 
